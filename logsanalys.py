@@ -1,5 +1,4 @@
 import psycopg2
-import re
 from datetime import date
 
 db = psycopg2.connect(database='news'	)
