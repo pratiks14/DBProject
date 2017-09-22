@@ -6,17 +6,19 @@ from datetime import date
 def connect():
     try:
         return psycopg2.connect("dbname=news")
-    except:
+    except Exception:
         print("Connection failed")
+
 
 def formatted_print(query_results, header, prefix):
 
-    print('\n'+header)
+    print('\n' + header)
     for i in range(len(query_results)):
         print(prefix.format(query_results[i][0], query_results[i][1]))
     return cur.fetchall()
 
-db = connect()        
+
+db = connect()
 cur = db.cursor()
 cur.execute("""select title ,
 (select count(log.id)
@@ -28,8 +30,7 @@ limit 3;""")
 # this query uses subquery to count the unique logids viewing the article.
 
 res = cur.fetchall()
-formatted_print(res, "Three most popular articles of all time:"
-                , "{} - {} views")
+formatted_print(res, "Three most popular articles of all time:", "{} - {} views")
 
 cur.execute("""select name,
 sum((select count(log.id)
@@ -42,8 +43,7 @@ order by views desc;""")
 # this query add the logids visiting articles belonging to authors
 
 res = cur.fetchall()
-formatted_print(res, "The most popular authors of all time:"
-                , "{} - {} views")
+formatted_print(res, "The most popular authors of all time:", "{} - {} views")
 
 cur.execute("""select a.dt,round(cast(neg/tot*100 as numeric),2)
 from (select DATE(time) as dt,cast(count(*) as float) as tot
@@ -63,5 +63,5 @@ res = cur.fetchall()
 print("\nThe days on which more 1% request leads to error:")
 for i in range(len(res)):
     dt = res[i][0].strftime("%A %d, %B %Y")
-    print("{} - {}% erros".format(dt, res[i][1]))    
+    print("{} - {}% erros".format(dt, res[i][1]))
 db.close()
